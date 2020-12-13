@@ -4,6 +4,7 @@ var fs = require('fs');
 var path = require('path');
 var mime = require('mime');
 var cache = {};
+var chatServer = require('./lib/chat_server');
 
 // create server, define per-request behavior
 var server = http.createServer(function(request, response) {
@@ -44,11 +45,9 @@ function sendFile(response, filePath, fileContents){
 
 // tries to find a file in either cache or disk and sends appropriate response
 function serveStatic(response, cache, absPath){
-
   // if the data is cached, just retrieve it
   if(cache[absPath]){
     sendFile(response, absPath, cache[absPath]);
-
     // otherwise we need to check the disk
   } else {
     // check file system for the data in the path
@@ -57,11 +56,10 @@ function serveStatic(response, cache, absPath){
         // read it and send if it exists
         fs.readFile(absPath, function(err, data){
           if(err){
-
             // if something occurs just dip out
+            console.log("Error occurred while reading data.")
             send404(response);
           } else {
-
             // cache after we read it
             cache[absPath] = data;
             sendFile(response, absPath, data);
@@ -69,12 +67,15 @@ function serveStatic(response, cache, absPath){
         });
       } else {
         // send 404 if not found
+        console.log("Data not found.")
         send404(response);
       }
-    })
+    });
   }
 }
 
 server.listen(3000, function() {
   console.log("Server listening on port 3000");
-})
+});
+
+chatServer.listen(server);

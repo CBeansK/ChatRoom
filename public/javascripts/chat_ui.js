@@ -29,7 +29,7 @@ function processUserInput(chatApp, socket) {
 }
 
 // create new connection
-var socket = io.connect('http://localhost:3000');
+var socket = io.connect();
 
 $(document).ready(function(){
   var chatApp = new Chat(socket);
@@ -39,7 +39,7 @@ $(document).ready(function(){
     var message;
 
     if(result.success) {
-      message = 'You are now know as ' + result.name +'.';
+      message = 'You are now known as ' + result.name +'.';
     } else {
       message = result.message;
     }
@@ -62,6 +62,7 @@ $(document).ready(function(){
   socket.on('rooms', function(rooms) {
     $('#room-list').empty();
 
+    // build list of rooms
     for(var room in rooms){
       room = room.substring(1, room.length);
       if (room != ''){
